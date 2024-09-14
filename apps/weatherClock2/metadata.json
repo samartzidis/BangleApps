@@ -1,7 +1,7 @@
 {
-  "id": "weatherClock",
-  "name": "Weather Clock",
-  "shortName": "Weather Clock",
+  "id": "weatherClock2",
+  "name": "Weather Clock 2",
+  "shortName": "Weather Clock 2",
   "version": "0.06",
   "description": "A clock which displays current weather conditions (requires Gadgetbridge and Weather apps).",
   "icon": "app.png",
