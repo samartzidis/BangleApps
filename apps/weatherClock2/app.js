@@ -110,12 +110,12 @@ function draw() {
   cLayout.date.label = s.date ? locale.date(date, 1).toUpperCase() : "";
   let curr = w.get(); // Get weather from weather app.  
   if(curr){              
-      /*
-      const temp = locale.temp(curr.temp-273.15).match(/^(\D*\d*)(.*)$/);
-      cLayout.temp.label = temp[1] + " " + temp[2];
-      */
+      
+      //const temp = locale.temp(curr.temp-273.15).match(/^(\D*\d*)(.*)$/);
+      //cLayout.temp.label = temp[1] + " " + temp[2];
+      
       const temp = locale.temp(curr.temp-273.15);
-      console.log(temp);
+      //console.log(temp);
       cLayout.temp.label = temp;
     
       const code = curr.code || -1;
@@ -127,8 +127,11 @@ function draw() {
         cLayout.wIcon.src = s.icon ? showIconT : getDummy;
       }
     
-      const wind = locale.speed(curr.wind).match(/^(\D*\d*)(.*)$/);
-      cLayout.wind.label = wind[1] + " " + wind[2] + " " + (curr.wrose||"").toUpperCase();
+      //const wind = locale.speed(curr.wind).match(/^(\D*\d*)(.*)$/);      
+      //cLayout.wind.label = wind[1] + " " + wind[2] + " " + (curr.wrose||"").toUpperCase();
+      const wind = locale.speed(curr.wind);
+      //console.log(wind);
+      cLayout.wind.label = wind;
   }
   else{
       cLayout.temp.label = "Err";
@@ -172,8 +175,8 @@ var cLayout = new Layout({
   type: "v", c: [
     {type: "txt", font: "35%", halign: 1, fillx: 1, pad: 0, label: "00:00", id: "time"},
     {type: "v", fillx: 1, c: [ // Changed "h" to "v" to stack day and date vertically
-        {type: "txt", font: "20%", label: labelDay, id: "dow"},   // Day on one line
-        {type: "txt", font: "15%", label: labelDate, id: "date"}  // Date on the next line
+        {type: "txt", font: "20%", label: labelDay, id: "dow", halign: 1},   // Day on one line
+        {type: "txt", font: "15%", label: labelDate, id: "date", halign: 1}  // Date on the next line
       ]
     },
     {type: "h", valign: 1, fillx: 1, c: [
