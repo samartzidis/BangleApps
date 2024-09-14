@@ -1,5 +1,5 @@
 (function(back) {
-  const SETTINGS_FILE = "weatherClock.json";
+  const SETTINGS_FILE = "weatherClock2.json";
 
   // Load settings file
   const storage = require('Storage');
@@ -17,7 +17,7 @@
   }
 
   E.showMenu({
-    '': { 'title': 'Weather Clock' },
+    '': { 'title': 'Weather Clock 2' },
     '< Back': back,
 	'Show date': {
       value: !!s.date,

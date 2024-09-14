@@ -1,7 +1,7 @@
 const Layout = require("Layout");
 const storage = require("Storage");
 const locale = require("locale");
-const SETTINGS_FILE = "weatherClock.json";
+const SETTINGS_FILE = "weatherClock2.json";
 let s;
 const w = require("weather");
 
