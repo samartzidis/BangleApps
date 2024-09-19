@@ -7,9 +7,9 @@ Contrast to the original _Weather Clock_ it does not need the bangle.js _Weather
 
 ## Requirements
 
-**This clock requires Gadgetbridge and the Weather app in order to get weather data!**
+**This clock requires Gadgetbridge (with _Allow Internet Access_ enabled) on your phone and the _My Location_ app on bangle.js in order to get weather data.**
 
-See the [Bangle.js Gadgetbridge documentation](https://www.espruino.com/Gadgetbridge) for instructions on setting up Gadgetbridge and weather.
+See the [Bangle.js Gadgetbridge documentation](https://www.espruino.com/Gadgetbridge) for instructions.
 
 ![Screenshot](screens/screen1.png)
 
