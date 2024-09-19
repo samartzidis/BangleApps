@@ -1,9 +1,9 @@
 # Weather Clock 2
 
-A clock (based on Weather Clock by James Gough).
+A clock (based on the _Weather Clock_ by James Gough).
 
 This version retrieves the current location from the _My Location_ bangle.js app. and communicates directly with the open-meteo.com API. 
-Contrast to the original _Weather Clock_ it does not need the bangle.js _Weather_ app. and a helper weather client app to be installed on your phone.
+Contrast to the original _Weather Clock_ it does not need the bangle.js _Weather_ app. or any helper weather client app to be installed on your phone.
 
 ## Requirements
 
