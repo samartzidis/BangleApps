@@ -1,10 +1,9 @@
-# Weather Clock
+# Weather Clock 2
 
-A clock which displays the current weather conditions. Time, day of week, date, temperature, wind speed, and an icon indicating the weather condition are displayed.
+A clock (based on Weather Clock by James Gough).
 
-The date, day of week, temperature, weather icon and/or wind speed can be hidden in Settings. The icons can be changed to those of the Weather app.
-
-Standard widgets are displayed.
+This version retrieves the current location from the _My Location_ bangle.js app. and communicates directly with the open-meteo.com API. 
+Contrast to the original _Weather Clock_ it does not need the bangle.js _Weather_ app. and a helper weather client app to be installed on your phone.
 
 ## Requirements
 
@@ -14,8 +13,6 @@ See the [Bangle.js Gadgetbridge documentation](https://www.espruino.com/Gadgetbr
 
 ![Screenshot](screens/screen1.png)
 
-![Screenshot2](screens/screen2.png)
-
 ## Creator
 
-James Gough
+George Samartzidis
