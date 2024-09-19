@@ -34,21 +34,67 @@ function getDummy() {
     return require("heatshrink").decompress(atob("gMBwMAwA"));
 }
 
+// Code	Description (https://open-meteo.com/en/docs)
+// 0	Clear sky
+// 1, 2, 3	Mainly clear, partly cloudy, and overcast
+// 45, 48	Fog and depositing rime fog
+// 51, 53, 55	Drizzle: Light, moderate, and dense intensity
+// 56, 57	Freezing Drizzle: Light and dense intensity
+// 61, 63, 65	Rain: Slight, moderate and heavy intensity
+// 66, 67	Freezing Rain: Light and heavy intensity
+// 71, 73, 75	Snow fall: Slight, moderate, and heavy intensity
+// 77	Snow grains
+// 80, 81, 82	Rain showers: Slight, moderate, and violent
+// 85, 86	Snow showers slight and heavy
+// 95 *	Thunderstorm: Slight or moderate
+// 96, 99 *	Thunderstorm with slight and heavy hail
+
 // Selects the weather icon based on weathercode
+// Selects the weather icon based on weather code
 function chooseIconByCode(code) {
     switch (code) {
-        case 0: return getSun; // Clear sky
-        case 1: case 2: case 3: return getPartSun; // Partly cloudy
-        case 45: case 48: return getFog; // Fog
-        case 51: case 53: case 55: case 56: case 57: return getRain; // Drizzle
-        case 61: case 63: case 65: return getRain; // Rain
-        case 66: case 67: return getSnow; // Freezing rain
-        case 71: case 73: case 75: return getSnow; // Snowfall
-        case 80: case 81: case 82: return getRain; // Rain showers
-        case 95: case 96: case 99: return getStorm; // Thunderstorm
-        default: return getCloud; // Fallback for other weather codes
+        case 0:
+            return getSun(); // Clear sky
+        case 1: 
+        case 2: 
+        case 3:
+            return getPartSun(); // Mainly clear, partly cloudy, overcast
+        case 45: 
+        case 48:
+            return getFog(); // Fog and depositing rime fog
+        case 51: 
+        case 53: 
+        case 55: 
+        case 56: 
+        case 57:
+            return getRain(); // Drizzle or freezing drizzle
+        case 61: 
+        case 63: 
+        case 65:
+            return getRain(); // Rain
+        case 66: 
+        case 67:
+            return getSnow(); // Freezing rain (treated as snow)
+        case 71: 
+        case 73: 
+        case 75:
+            return getSnow(); // Snowfall
+        case 80: 
+        case 81: 
+        case 82:
+            return getRain(); // Rain showers
+        case 85: 
+        case 86:
+            return getSnow(); // Snow showers
+        case 95: 
+        case 96: 
+        case 99:
+            return getStorm(); // Thunderstorm or thunderstorm with hail
+        default:
+            return getCloud(); // Fallback for other weather codes
     }
 }
+
 
 // Timeout for weather updates (30 minutes) and UI updates (1 minute)
 var drawTimeout;
