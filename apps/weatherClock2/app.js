@@ -1,4 +1,4 @@
-=const Layout = require("Layout");
+const Layout = require("Layout");
 const storage = require("Storage");
 const locale = require("locale");
 
@@ -167,8 +167,8 @@ function fetchWeather() {
         cLayout.wind.label = cLayout.temp.label = "No GPS";
         cLayout.wIcon.src = getErr;
 
-        cLayout.clear();
-        cLayout.render();
+        //cLayout.clear();
+        //cLayout.render();
 
         // Queue the next weather update
         queueWeatherUpdate();
@@ -214,13 +214,15 @@ function fetchWeather() {
           cLayout.wind.label = "Error";
           cLayout.wIcon.src = getErr;
           
-          cLayout.clear();
-          cLayout.render();
+          //cLayout.clear();
+          //cLayout.render();
         }
 
         // Queue the next weather update
         queueWeatherUpdate();
     });
+
+    cLayout.render();
 }
 
 function fetchTime() {
