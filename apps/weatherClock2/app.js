@@ -190,7 +190,7 @@ function fetchWeather() {
 
         let temp = locale.temp(weatherData.current_weather.temperature);
         let wind = locale.speed(weatherData.current_weather.windspeed);
-        let weatherCode = locale.speed(weatherData.current_weather.weathercode);
+        let weatherCode = weatherData.current_weather.weathercode;
 
         // Update layout with fetched weather data
         cLayout.temp.label = temp;
