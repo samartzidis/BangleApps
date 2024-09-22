@@ -53,6 +53,8 @@ function getDummy() {
 // Selects the weather icon based on weather code
 function chooseIconByCode(code) {
     switch (code) {
+        case null:
+            return getErr(); // Error
         case 0:
             return getSun(); // Clear sky
         case 1: 
@@ -95,21 +97,22 @@ function chooseIconByCode(code) {
     }
 }
 
-
-// Timeout for weather updates (30 minutes) and UI updates (1 minute)
-var timeTimeout;
-var weatherTimeout;
-var weatherUpdateErrors = 0;
+let timeTimeout;
+let weatherTimeout;
+let weatherUpdateSuccess = false;
+let temp = "...";
+let wind = "";
+let weatherCode = null;
 
 // Schedule the next draw in one minute
-function queueFetchTime() {
+function queueDraw() {
   
     if (timeTimeout) 
       clearTimeout(timeTimeout);
   
     timeTimeout = setTimeout(function () {
         timeTimeout = undefined;
-        fetchTime();
+        draw();
     }, 60000 - (Date.now() % 60000));
 }
 
@@ -121,7 +124,7 @@ function queueWeatherUpdate() {
 
     weatherTimeout = setTimeout(function () {
         fetchWeather();
-    }, weatherUpdateErrors == 0 ? 1800000 : 60000); // 30 minutes = 1800000 msec, 1 minute = 60000 msec
+    }, weatherUpdateSuccess ? 1800000 : 60000); // 30 minutes = 1800000 msec, 1 minute = 60000 msec
 }
 
 /*
@@ -159,89 +162,88 @@ function fetchWeather() {
 
     // Fetch location settings
     let locationSettings = require('Storage').readJSON(LOCATION_SETTINGS_FILE, 1) || { lat: 0, lon: 0, location: "" };
+
     if (locationSettings.lat == 0 || locationSettings.lon == 0) {
         console.log("No GPS");
 
-        weatherLastUpdateSuccess = false;
-
-        cLayout.wind.label = cLayout.temp.label = "No GPS";
-        cLayout.wIcon.src = getErr;
-
-        //cLayout.clear();
-        //cLayout.render();
+        // cLayout.temp.label = "No GPS";
+        // cLayout.wind.label = "No GPS";
+        // cLayout.wIcon.src = getErr;
+        temp = "NoGPS";
+        wind = "";
+        weatherCode = null;
 
         // Queue the next weather update
-        queueWeatherUpdate();
+        queueWeatherUpdate();        
     }
+    else
+    {
+        let uri = `https://api.open-meteo.com/v1/forecast?latitude=${locationSettings.lat}&longitude=${locationSettings.lon}&current_weather=true`;
+        Bangle.http(uri, {
+            timeout: 10000,
+            headers: { Accept: "*/*" }
+        })
+        .then(data => {
 
-    let uri = `https://api.open-meteo.com/v1/forecast?latitude=${locationSettings.lat}&longitude=${locationSettings.lon}&current_weather=true`;
-    Bangle.http(uri, {
-        timeout: 10000,
-        headers: { Accept: "*/*" }
-    })
-    .then(data => {
+            console.log("Got weather data: ", data);
 
-        console.log("Got weather data: ", data);
+            //let text = JSON.stringify(data);    
+            let weatherData = JSON.parse(data.resp);
 
-        weatherUpdateErrors = 0;
+            temp = locale.temp(weatherData.current_weather.temperature);
+            wind = locale.speed(weatherData.current_weather.windspeed);
+            weatherCode = weatherData.current_weather.weathercode;
 
-        //let text = JSON.stringify(data);    
-        let weatherData = JSON.parse(data.resp);
+            // Update layout with fetched weather data
+            //cLayout.temp.label = temp;
+            //cLayout.wind.label = wind;
+            //cLayout.wIcon.src = s.icon ? chooseIconByCode(weatherCode) : getDummy;
 
-        let temp = locale.temp(weatherData.current_weather.temperature);
-        let wind = locale.speed(weatherData.current_weather.windspeed);
-        let weatherCode = weatherData.current_weather.weathercode;
 
-        // Update layout with fetched weather data
-        cLayout.temp.label = temp;
-        cLayout.wind.label = wind;
-        cLayout.wIcon.src = s.icon ? chooseIconByCode(weatherCode) : getDummy;
 
-        // Queue the next weather update in 30 minutes
-        queueWeatherUpdate();
+            // Queue the next weather update in 30 minutes
+            queueWeatherUpdate();
 
-    })
-    .catch(err => {
+        })
+        .catch(err => {
 
-        console.log("Error fetching weather: ", err);
+            console.log("Error fetching weather: ", err);
+    
+            //   cLayout.temp.label = "Error";
+            //   cLayout.wind.label = "Error";
+            //   cLayout.wIcon.src = getErr;
+            temp = "Error";
+            wind = "";
+            weatherCode = null;
 
-        weatherUpdateErrors++;
-        console.log("weatherUpdateErrors: ", weatherUpdateErrors);
-      
-        if (weatherUpdateErrors >= 10) {
-          
-          cLayout.temp.label = "Error";
-          cLayout.wind.label = "Error";
-          cLayout.wIcon.src = getErr;
-          
-          //cLayout.clear();
-          //cLayout.render();
-        }
+            // Queue the next weather update
+            queueWeatherUpdate();
+        });
+    }   
 
-        // Queue the next weather update
-        queueWeatherUpdate();
-    });
-
-    cLayout.render();
+    queueDraw();
 }
 
-function fetchTime() {
+function draw() {
   
-    var date = new Date();
-  
+    var date = new Date();  
     cLayout.time.label = locale.time(date, 1);
     cLayout.dow.label = s.day ? locale.dow(date, 1).toUpperCase() + " " : "";
     cLayout.date.label = s.date ? locale.date(date, 1).toUpperCase() : "";
+
+    cLayout.temp.label = temp;
+    cLayout.wind.label = wind;
+    cLayout.wIcon.src = s.icon ? chooseIconByCode(weatherCode) : getDummy;
     
     cLayout.clear();
     cLayout.render();
-
-    // Queue in one minute
-    queueFetchTime();
+    
+    queueDraw();
 }
 
 // Load settings from file
 s = storage.readJSON(SETTINGS_FILE, 1) || {};
+
 s.src = s.src === undefined ? false : s.src;
 s.icon = s.icon === undefined ? true : s.icon;
 s.day = s.day === undefined ? true : s.day;
@@ -273,12 +275,12 @@ var cLayout = new Layout({
                     type: "v", fillx: 1, c: [
                         {
                             type: "h", c: [
-                                { type: "txt", font: fontTemp, id: "temp", label: "- °C" },
+                                { type: "txt", font: fontTemp, id: "temp", label: "000 °C" },
                             ]
                         },
                         {
                             type: "h", c: [
-                                { type: "txt", font: fontWind, id: "wind", label: "- km/h" },
+                                { type: "txt", font: fontWind, id: "wind", label: "000 km/h" },
                             ]
                         }
                     ]
@@ -293,11 +295,10 @@ g.clear();
 Bangle.setUI("clock");  // Show launcher when middle button pressed
 Bangle.loadWidgets();
 Bangle.drawWidgets();
-
 cLayout.render();
 
 fetchWeather();
-fetchTime();
+draw();
 
 
 
