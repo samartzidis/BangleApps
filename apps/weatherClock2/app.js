@@ -1,4 +1,4 @@
-const Layout = require("Layout");
+=const Layout = require("Layout");
 const storage = require("Storage");
 const locale = require("locale");
 
@@ -208,7 +208,8 @@ function fetchWeather() {
         weatherUpdateErrors++;
         console.log("weatherUpdateErrors: ", weatherUpdateErrors);
       
-        if (weatherUpdateErrors > 3) {
+        if (weatherUpdateErrors >= 10) {
+          
           cLayout.temp.label = "Error";
           cLayout.wind.label = "Error";
           cLayout.wIcon.src = getErr;
