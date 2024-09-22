@@ -2,7 +2,7 @@
   "id": "weatherClock2",
   "name": "Weather Clock 2",
   "shortName": "Weather Clock 2",
-  "version": "0.10",
+  "version": "0.11",
   "description": "A clock which displays current weather conditions (requires Gadgetbridge and My Location apps).",
   "icon": "app.png",
   "dependencies": { "mylocation":"app" },

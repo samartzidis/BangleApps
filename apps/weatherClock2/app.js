@@ -97,27 +97,31 @@ function chooseIconByCode(code) {
 
 
 // Timeout for weather updates (30 minutes) and UI updates (1 minute)
-var drawTimeout;
+var timeTimeout;
 var weatherTimeout;
-var weatherLastUpdateSuccess = false;
+var weatherUpdateErrors = 0;
 
 // Schedule the next draw in one minute
-function queueDraw() {
-    if (drawTimeout) clearTimeout(drawTimeout);
-    drawTimeout = setTimeout(function () {
-        drawTimeout = undefined;
-        draw();
+function queueFetchTime() {
+  
+    if (timeTimeout) 
+      clearTimeout(timeTimeout);
+  
+    timeTimeout = setTimeout(function () {
+        timeTimeout = undefined;
+        fetchTime();
     }, 60000 - (Date.now() % 60000));
 }
 
 // Schedule the next weather update
 function queueWeatherUpdate() {
+  
     if (weatherTimeout)
         clearTimeout(weatherTimeout);
 
     weatherTimeout = setTimeout(function () {
         fetchWeather();
-    }, weatherLastUpdateSuccess ? 1800000 : 60000); // 1 minute = 60000 msec, 30 minutes = 1800000 msec
+    }, weatherUpdateErrors == 0 ? 1800000 : 60000); // 30 minutes = 1800000 msec, 1 minute = 60000 msec
 }
 
 /*
@@ -170,7 +174,7 @@ function fetchWeather() {
         queueWeatherUpdate();
     }
 
-    let uri = `https://api.open-meteo.com/v1/forecast?latitude=${locationSettings.lat}&longitude=${locationSettings.lon}&current_weather=true`
+    let uri = `https://api.open-meteo.com/v1/forecast?latitude=${locationSettings.lat}&longitude=${locationSettings.lon}&current_weather=true`;
     Bangle.http(uri, {
         timeout: 10000,
         headers: { Accept: "*/*" }
@@ -179,7 +183,7 @@ function fetchWeather() {
 
         console.log("Got weather data: ", data);
 
-        weatherLastUpdateSuccess = true;
+        weatherUpdateErrors = 0;
 
         //let text = JSON.stringify(data);    
         let weatherData = JSON.parse(data.resp);
@@ -201,32 +205,36 @@ function fetchWeather() {
 
         console.log("Error fetching weather: ", err);
 
-        weatherLastUpdateSuccess = false;
-
-        cLayout.temp.label = "Err";
-        cLayout.wind.label = "Err";
-        cLayout.wIcon.src = getErr;
-
-        cLayout.clear();
-        cLayout.render();
+        weatherUpdateErrors++;
+        console.log("weatherUpdateErrors: ", weatherUpdateErrors);
+      
+        if (weatherUpdateErrors > 3) {
+          cLayout.temp.label = "Error";
+          cLayout.wind.label = "Error";
+          cLayout.wIcon.src = getErr;
+          
+          cLayout.clear();
+          cLayout.render();
+        }
 
         // Queue the next weather update
         queueWeatherUpdate();
     });
 }
 
-function draw() {
+function fetchTime() {
+  
     var date = new Date();
+  
     cLayout.time.label = locale.time(date, 1);
     cLayout.dow.label = s.day ? locale.dow(date, 1).toUpperCase() + " " : "";
     cLayout.date.label = s.date ? locale.date(date, 1).toUpperCase() : "";
-
-    // Only update the clock; weather is fetched every 30 minutes
+    
     cLayout.clear();
     cLayout.render();
 
-    // Queue draw in one minute
-    queueDraw();
+    // Queue in one minute
+    queueFetchTime();
 }
 
 // Load settings from file
@@ -262,12 +270,12 @@ var cLayout = new Layout({
                     type: "v", fillx: 1, c: [
                         {
                             type: "h", c: [
-                                { type: "txt", font: fontTemp, id: "temp", label: "000 °C" },
+                                { type: "txt", font: fontTemp, id: "temp", label: "- °C" },
                             ]
                         },
                         {
                             type: "h", c: [
-                                { type: "txt", font: fontWind, id: "wind", label: "00 km/h" },
+                                { type: "txt", font: fontWind, id: "wind", label: "- km/h" },
                             ]
                         }
                     ]
@@ -282,9 +290,11 @@ g.clear();
 Bangle.setUI("clock");  // Show launcher when middle button pressed
 Bangle.loadWidgets();
 Bangle.drawWidgets();
+
 cLayout.render();
-fetchWeather();  // Fetch weather data immediately when the app starts
-draw();  // Start the UI update process
+
+fetchWeather();
+fetchTime();
 
 
 
