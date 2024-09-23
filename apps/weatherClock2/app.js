@@ -194,11 +194,11 @@ function fetchWeather() {
             temp = locale.temp(weatherData.current_weather.temperature);
             wind = locale.speed(weatherData.current_weather.windspeed);
             weatherCode = weatherData.current_weather.weathercode;
-
-            // Queue the next weather update in 30 minutes
-            queueWeatherUpdate();
             
             queueDraw();
+
+            // Queue the next weather update in 30 minutes
+            queueWeatherUpdate();            
         })
         .catch(err => {
 
