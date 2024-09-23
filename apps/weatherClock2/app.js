@@ -171,7 +171,10 @@ function fetchWeather() {
         temp = "NoGPS";
         wind = "";
         weatherCode = -1;
-        weatherUpdateSuccess = false;          
+        weatherUpdateSuccess = false;
+
+        // Queue the next weather update
+        queueWeatherUpdate();    
     }
     else
     {
@@ -191,6 +194,11 @@ function fetchWeather() {
             temp = locale.temp(weatherData.current_weather.temperature);
             wind = locale.speed(weatherData.current_weather.windspeed);
             weatherCode = weatherData.current_weather.weathercode;
+
+            // Queue the next weather update in 30 minutes
+            queueWeatherUpdate();
+            
+            queueDraw();
         })
         .catch(err => {
 
@@ -200,14 +208,11 @@ function fetchWeather() {
             temp = "Error";
             wind = "";
             weatherCode = -1;
+
+            // Queue the next weather update
+            queueWeatherUpdate();
         });
-    }   
-
-    // Queue the next weather update
-    queueWeatherUpdate();
-
-    // Trigger immediate redraw
-    queueDraw();
+    }       
 }
 
 function draw() {
