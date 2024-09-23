@@ -171,6 +171,7 @@ function fetchWeather() {
         temp = "NoGPS";
         wind = "";
         weatherCode = -1;
+        weatherUpdateSuccess = false;
 
         // Queue the next weather update
         queueWeatherUpdate();        
@@ -189,6 +190,7 @@ function fetchWeather() {
             //let text = JSON.stringify(data);    
             let weatherData = JSON.parse(data.resp);
 
+            weatherUpdateSuccess = true;
             temp = locale.temp(weatherData.current_weather.temperature);
             wind = locale.speed(weatherData.current_weather.windspeed);
             weatherCode = weatherData.current_weather.weathercode;
@@ -201,6 +203,7 @@ function fetchWeather() {
 
             console.log("Error fetching weather: ", err);
     
+            weatherUpdateSuccess = false;
             temp = "Error";
             wind = "";
             weatherCode = -1;
