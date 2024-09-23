@@ -54,6 +54,8 @@ function getDummy() {
 function chooseIconByCode(code) {
     switch (code) {
         case null:
+            return getDummy(); // Error
+        case -1:
             return getErr(); // Error
         case 0:
             return getSun(); // Clear sky
@@ -100,7 +102,7 @@ function chooseIconByCode(code) {
 let timeTimeout;
 let weatherTimeout;
 let weatherUpdateSuccess = false;
-let temp = "...";
+let temp = "";
 let wind = "";
 let weatherCode = null;
 
@@ -166,12 +168,9 @@ function fetchWeather() {
     if (locationSettings.lat == 0 || locationSettings.lon == 0) {
         console.log("No GPS");
 
-        // cLayout.temp.label = "No GPS";
-        // cLayout.wind.label = "No GPS";
-        // cLayout.wIcon.src = getErr;
         temp = "NoGPS";
         wind = "";
-        weatherCode = null;
+        weatherCode = -1;
 
         // Queue the next weather update
         queueWeatherUpdate();        
@@ -194,13 +193,6 @@ function fetchWeather() {
             wind = locale.speed(weatherData.current_weather.windspeed);
             weatherCode = weatherData.current_weather.weathercode;
 
-            // Update layout with fetched weather data
-            //cLayout.temp.label = temp;
-            //cLayout.wind.label = wind;
-            //cLayout.wIcon.src = s.icon ? chooseIconByCode(weatherCode) : getDummy;
-
-
-
             // Queue the next weather update in 30 minutes
             queueWeatherUpdate();
 
@@ -209,12 +201,9 @@ function fetchWeather() {
 
             console.log("Error fetching weather: ", err);
     
-            //   cLayout.temp.label = "Error";
-            //   cLayout.wind.label = "Error";
-            //   cLayout.wIcon.src = getErr;
             temp = "Error";
             wind = "";
-            weatherCode = null;
+            weatherCode = -1;
 
             // Queue the next weather update
             queueWeatherUpdate();
